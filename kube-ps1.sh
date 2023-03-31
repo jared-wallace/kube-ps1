@@ -239,6 +239,9 @@ _kube_ps1_update_cache() {
 _kube_ps1_get_context() {
   if [[ "${KUBE_PS1_CONTEXT_ENABLE}" == true ]]; then
     KUBE_PS1_CONTEXT="$(${KUBE_PS1_BINARY} config current-context 2>/dev/null)"
+    if [ $KUBE_PS1_CONTEXT = "auto-refresh-context" ];then
+      KUBE_PS1_CONTEXT="$(egctl config get |head -n 1|cut -d' ' -f2)"
+    fi
     # Set namespace to 'N/A' if it is not defined
     KUBE_PS1_CONTEXT="${KUBE_PS1_CONTEXT:-N/A}"
 
