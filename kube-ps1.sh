@@ -236,9 +236,27 @@ _kube_ps1_update_cache() {
   return $return_code
 }
 
+_set_background() {
+  # Decide on the profile name based on the variable's value
+  if [[ "$KUBE_PS1_CONTEXT" == *"prod"* ]]; then
+      PROFILE_NAME="prod" # replace with your actual profile name
+  elif [[ "$KUBE_PS1_CONTEXT" == *"dev"* ]]; then
+      PROFILE_NAME="dev" # replace with your actual profile name
+  elif [[ "$KUBE_PS1_CONTEXT" == *"test"* ]]; then
+      PROFILE_NAME="test" # replace with your actual profile name
+  else
+      PROFILE_NAME="Default"
+  fi
+
+  /Users/jarwallace/.iterm2/it2profile -s $PROFILE_NAME
+}
+
 _kube_ps1_get_context() {
   if [[ "${KUBE_PS1_CONTEXT_ENABLE}" == true ]]; then
     KUBE_PS1_CONTEXT="$(${KUBE_PS1_BINARY} config current-context 2>/dev/null)"
+    if [ -z $KUBE_PS1_CONTEXT ];then
+      KUBE_PS1_CONTEXT="N/A"
+    fi
     if [ $KUBE_PS1_CONTEXT = "auto-refresh-context" ];then
       KUBE_PS1_CONTEXT="$(egctl config get |head -n 1|cut -d' ' -f2)"
     fi
@@ -248,6 +266,7 @@ _kube_ps1_get_context() {
     if [[ ! -z "${KUBE_PS1_CLUSTER_FUNCTION}" ]]; then
       KUBE_PS1_CONTEXT=$($KUBE_PS1_CLUSTER_FUNCTION $KUBE_PS1_CONTEXT)
     fi
+    _set_background
   fi
 }
 
@@ -320,6 +339,7 @@ kubeon() {
   fi
 
   KUBE_PS1_ENABLED=on
+  _set_background
 }
 
 kubeoff() {
@@ -335,6 +355,7 @@ kubeoff() {
   fi
 
   KUBE_PS1_ENABLED=off
+  /Users/jarwallace/.iterm2/it2profile -s Default
 }
 
 # Build our prompt
